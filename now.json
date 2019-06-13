@@ -5,5 +5,9 @@
     { "src": "www/**/*", "use": "@now/static" },
     { "src": "api/**/*.js", "use": "@now/node" }
   ],
-  "routes": [{ "src": "/", "dest": "www/index.html" }]
+  "routes": [{ "src": "/", "dest": "www/index.html" }],
+  "env": {
+    "YUUVIS_AUTH_USER":"frank",
+    "YUUVIS_AUTH_SECRET":"@sec_pwd"
+  }
 }
