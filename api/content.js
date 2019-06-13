@@ -5,5 +5,12 @@ const app = express();
 const yuuvis = require('../lib/yuuvis');
 
 app.get('*', async (req, res, next) => {
-    resp.send(yuuvis.content(req.query.id));
+    try {
+        yuuvis.content(req.query.id, res);
+    } catch(e) {
+        next(e);
+    }
+
 });
+
+module.exports = app;

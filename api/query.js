@@ -33,40 +33,46 @@ const getObject = async (req, res) => {
     let result = await yuuvis.query("SELECT * FROM " + objectType);
 
     const messages = [];
+
     result.objects.forEach(o => {
+      let title = o.properties['email:subject'] ? o.properties['email:subject'].value : o.properties['enaio:objectId'].value;
+      let subTitle = o.properties['email:from'] ? o.properties['email:from'].value : 'subtitle';
       messages.push({
-        "card": {
-          "title": o.properties['email:subject'].value,
-          "subtitle": o.properties['email:from'].value,
-          "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
-          "buttons": [
-            {
-              "text": "Open",
-              "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
-            }
-          ]
-        }
-      });
-      messages.push({
-        "basicCard": {
-          "title": o.properties['email:subject'].value,
-          "subtitle": o.properties['email:from'].value,
-          "formattedText": "Hurz",
-          "image": {
-            "url": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
-            "accessibilityText": "Deine Mudda"
-          },
-          "buttons": [
-            {
-              "title": "Open",
-              "openUriAction": {
-                "url": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+          "card": {
+            "title": title,
+            "subtitle": subTitle,
+            "imageUri": `https://yuuvisflow.now.sh/api/content.js?id=${o.properties['enaio:objectId'].value}`,
+            "buttons": [
+              {
+                "text": "Open",
+                "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
               }
-            }
-          ]
-        }
-      })
-    })
+            ]
+          }
+      });
+      
+      /*messages.push({
+          "basicCard": {
+            "title": title,
+            "subtitle": subTitle,
+            "formattedText": title,
+            "image": {
+              "imageUri": `https://yuuvisflow.now.sh/api/content.js?id=${o.properties['enaio:objectId'].value}`,
+              "accessibilityText": title
+            },
+            "buttons": [
+              {
+                "title": "Open",
+                "openUriAction": {
+                  "uri": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+                }
+              }
+            ]
+          }
+        })
+      }
+      */
+    }) // forEach
 
     res.end(JSON.stringify({
       fulfillmentText: 'Alright, Buddy',

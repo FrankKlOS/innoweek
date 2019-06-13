@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "name": "innoweek",
+  "name": "yuuvisflow",
   "builds": [
     { "src": "www/**/*", "use": "@now/static" },
     { "src": "api/**/*.js", "use": "@now/node" }
   ],
   "routes": [{ "src": "/", "dest": "www/index.html" }],
+  "alias": "yuuvisflow.now.sh",
   "env": {
     "YUUVIS_AUTH_USER":"frank",
     "YUUVIS_AUTH_SECRET":"@sec_pwd"
