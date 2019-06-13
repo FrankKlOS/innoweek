@@ -51,13 +51,17 @@ const getObject = async (req, res) => {
         "basicCard": {
           "title": o.properties['email:subject'].value,
           "subtitle": o.properties['email:from'].value,
+          "formattedText": "Hurz",
           "image": {
-            "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+            "url": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+            "accessibilityText": "Deine Mudda"
           },
-          "buttons": [ 
+          "buttons": [
             {
-              "text": "Open",
-              "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+              "title": "Open",
+              "openUriAction": {
+                "url": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+              }
             }
           ]
         }
