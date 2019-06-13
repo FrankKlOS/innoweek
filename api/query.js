@@ -32,19 +32,37 @@ const getObject = async (req, res) => {
   } else {
     let result = await yuuvis.query("SELECT * FROM " + objectType);
 
-    const messages = result.objects.map(o => ({
-      "card": {
-        "title": o.properties['email:subject'].value,
-        "subtitle": o.properties['email:from'].value,
-        "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
-        "buttons": [
-          {
-            "text": "Open",
-            "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
-          }
-        ]
-      }
-    }))
+    const messages = [];
+    result.objects.forEach(o => {
+      messages.push({
+        "card": {
+          "title": o.properties['email:subject'].value,
+          "subtitle": o.properties['email:from'].value,
+          "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+          "buttons": [
+            {
+              "text": "Open",
+              "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+            }
+          ]
+        }
+      });
+      messages.push({
+        "basicCard": {
+          "title": o.properties['email:subject'].value,
+          "subtitle": o.properties['email:from'].value,
+          "image": {
+            "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+          },
+          "buttons": [ 
+            {
+              "text": "Open",
+              "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+            }
+          ]
+        }
+      })
+    })
 
     res.end(JSON.stringify({
       fulfillmentText: 'Alright, Buddy',
