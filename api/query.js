@@ -1,76 +1,81 @@
 const express = require('express');
 //const helmet = require('helmet');
 const bodyParser = require('body-parser');
-const got = require('got');
+
 const app = express();
+const yuuvis = require('../lib/yuuvis');
 
 app.use(bodyParser.json());
 
 //app.use(helmet());
 
-const yuuvisUrl = process.env.YUUVIS_URL || 'https://kolibri.enaioci.net'
-const yuuvisTenant = process.env.YUUVIS_TENANT || 'kolibri'
-
-const yuuvisAuthMethod = process.env.YUUVIS_AUTH_METHOD || 'BASIC';
-const yuuvisAuthUser = process.env.YUUVIS_AUTH_USER;
-const yuuvisAuthSecret = process.env.YUUVIS_AUTH_SECRET;
-
-/**
- * Creates http headers for a request
- */
-const createHeaders=()=>{
-  var headers = {
-    'X-ID-Tenant-Name' : yuuvisTenant,
-    'Content-Type' : 'application/json'
-  }
-  if( yuuvisAuthMethod=='BASIC' ) {
-    if( !yuuvisAuthUser ) throw("User not set for basic auth.");
-    if( !yuuvisAuthSecret ) throw("Secret not set for basic auth.");
-    headers['Authorization'] = 'Basic '+ Buffer.from( yuuvisAuthUser +':'+ yuuvisAuthSecret ).toString('base64') ;
-  } else if( yuuvisAuthMethod=='OCP' ) {
-    if( !yuuvisAuthSecret ) throw("Secret not set for OCP.");
-    headers['Ocp-Apim-Subscription-Key'] = yuuvisAuthSecret;
+const count = async (req, res) => {
+  let objectType = req.body.queryResult.parameters.ObjectType;
+  if (!objectType) {
+    res.end(JSON.stringify({
+      fulfillmentText: `I can't do that without an object type`
+    }));
   } else {
-    throw("Unsupported authentication method "+yuuvisAuthMethod);
+    let result = await yuuvis.query("SELECT COUNT(*) FROM " + objectType);
+    res.end(JSON.stringify({
+      fulfillmentText: 'This magnificant bot says for ' + objectType + ' you have got ' + result.totalNumItems + ' objects.',
+    }));
   }
-  return headers;
 }
 
-const yuuvisQuery = async (csql) => {
-  
-  const searchUrl = yuuvisUrl + '/api/dms/objects/search';
+const getObject = async (req, res) => {
+  let objectType = req.body.queryResult.parameters.ObjectType;
+  if (!objectType) {
+    res.end(JSON.stringify({
+      fulfillmentText: `I can't do that without an object type`
+    }));
+  } else {
+    let result = await yuuvis.query("SELECT * FROM " + objectType);
 
-  console.log("POST URL "+searchUrl+" with "+csql);
-  console.log("POST headers "+JSON.stringify(createHeaders() ));
-  const {body} = await got.post( searchUrl, {
-    headers : createHeaders(),
-    body : JSON.stringify({
-      query : {
-        statement : csql
+    const messages = result.objects.map(o => ({
+      "card": {
+        "title": o.properties['email:subject'].value,
+        "subtitle": o.properties['email:from'].value,
+        "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+        "buttons": [
+          {
+            "text": "Open",
+            "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+          }
+        ]
       }
-    })
-  });
-  return JSON.parse(body);
+    }))
+
+    res.end(JSON.stringify({
+      fulfillmentText: 'Alright, Buddy',
+      fulfillmentMessages: messages
+    }));
+  }
 }
+
+
+
 
 app.post('*', async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
   res.status(200);
   console.log(JSON.stringify(req.body));
-  let objectType = req.body.queryResult.parameters.ObjectType;
+  let intent = req.body.queryResult.intent.displayName;
   try {
-    let result = await yuuvisQuery("SELECT COUNT(*) FROM "+objectType);
 
-    console.log(JSON.stringify(result));
+    switch (intent) {
+      case 'GetObject': {
+        getObject(req, res);
+        break;
+      }
+      case 'Aggregation': {
+        count(req, res);
+        break;
+      }
+    }
 
-    res.end(JSON.stringify({
-      //fulfillmentText : 'Manuel hat Recht',
-      fulfillmentText : 'This magnificant bot says for '+objectType+' you have got '+result.totalNumItems+' objects.',
-      requestMirror : JSON.stringify(req.body),
-      env: process.env
-    }));
-  } catch(e) {
-    console.log("Error "+e);
+  } catch (e) {
+    console.log("Error " + e);
     next(e);
   }
 });
