@@ -16,7 +16,9 @@ const deleteObject = async (req, res) => {
     throw new Error("id not set for delete");
   }
   await yuuvis.deleteObject(id);
-  res.status(200).end();
+  res.status(200).end(JSON.stringify({
+    fulfillmentText: `Your document was deleted. You won't see it again.`
+  }));
 }
 
 const count = async (req, res) => {
@@ -26,7 +28,7 @@ const count = async (req, res) => {
       fulfillmentText: `I can't do that without an object type`
     }));
   } else {
-    let result = await yuuvis.query("SELECT COUNT(*) FROM " + objectType);
+    let result = await yuuvis.query("SELECT COUNT(*) FROM " + objectType, 1);
     res.end(JSON.stringify({
       fulfillmentText: 'This magnificant bot says for ' + objectType + ' you have got ' + result.totalNumItems + ' objects.',
     }));
@@ -40,7 +42,7 @@ const getObject = async (req, res) => {
       fulfillmentText: `I can't do that without an object type`
     }));
   } else {
-    let result = await yuuvis.query("SELECT * FROM " + objectType);
+    let result = await yuuvis.query("SELECT * FROM " + objectType, 3);
 
     const messages = [];
     const carousel = {
