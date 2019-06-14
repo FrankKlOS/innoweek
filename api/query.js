@@ -35,22 +35,37 @@ const getObject = async (req, res) => {
     const messages = [];
 
     result.objects.forEach(o => {
-      let title = o.properties['email:subject'] ? o.properties['email:subject'].value : o.properties['enaio:objectId'].value;
-      let subTitle = o.properties['email:from'] ? o.properties['email:from'].value : 'subtitle';
+
+
+      let title = o.properties['enaio:objectId'].value;
+      let subTitle = 'subtitle';
+      switch (objectType) {
+        case 'tenKolibri:dokument': {
+          title = o.properties['tenKolibri:clienttitle'].value;
+          subTitle = o.properties['tenKolibri:clientdescription'].value;
+          break
+        }
+        case 'email:email': {
+          title = o.properties['email:subject'].value;
+          subTitle = o.properties['email:from'].value;
+          break
+        }
+      }
+
       messages.push({
-          "card": {
-            "title": title,
-            "subtitle": subTitle,
-            "imageUri": `https://yuuvisflow.now.sh/api/content.js?id=${o.properties['enaio:objectId'].value}`,
-            "buttons": [
-              {
-                "text": "Open",
-                "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
-              }
-            ]
-          }
+        "card": {
+          "title": title,
+          "subtitle": subTitle,
+          "imageUri": `https://yuuvisflow.now.sh/api/content.js?id=${o.properties['enaio:objectId'].value}`,
+          "buttons": [
+            {
+              "text": "Open",
+              "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+            }
+          ]
+        }
       });
-      
+
       /*messages.push({
           "basicCard": {
             "title": title,
