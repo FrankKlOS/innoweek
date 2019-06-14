@@ -9,6 +9,16 @@ app.use(bodyParser.json());
 
 //app.use(helmet());
 
+const deleteObject = async (req, res) => {
+  let id = req.body.queryResult.parameters.id;
+  console.log("Deleting "+id);
+  if( !id ) {
+    throw new Error("id not set for delete");
+  }
+  await yuuvis.deleteObject(id);
+  res.status(200).end();
+}
+
 const count = async (req, res) => {
   let objectType = req.body.queryResult.parameters.ObjectType;
   if (!objectType) {
@@ -135,6 +145,14 @@ app.post('*', async (req, res, next) => {
       }
       case 'Aggregation': {
         count(req, res);
+        break;
+      }
+      case 'Delete': {
+        deleteObject(req,res);
+        break;
+      }
+      default : {
+        res.status(400).end("Intent not supported.");
         break;
       }
     }
