@@ -33,6 +33,9 @@ const getObject = async (req, res) => {
     let result = await yuuvis.query("SELECT * FROM " + objectType);
 
     const messages = [];
+    const carousel = {
+      items: []
+    }
 
     result.objects.forEach(o => {
 
@@ -66,6 +69,20 @@ const getObject = async (req, res) => {
         }
       });
 
+
+      carousel.items.push({
+        "info": {
+          "key": ""
+        },
+        "title": title,
+        "description": subTitle,
+        "image": {
+          "imageUri": `https://yuuvisflow.now.sh/api/content.js?id=${o.properties['enaio:objectId'].value}`,
+        }
+      })
+
+
+
       /*messages.push({
           "basicCard": {
             "title": title,
@@ -88,6 +105,7 @@ const getObject = async (req, res) => {
       }
       */
     }) // forEach
+    messages.push({"carouselSelect": carousel});
 
     res.end(JSON.stringify({
       fulfillmentText: 'Alright, Buddy',
