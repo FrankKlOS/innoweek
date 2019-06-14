@@ -64,6 +64,10 @@ const getObject = async (req, res) => {
             {
               "text": "Open",
               "postback": `https://kolibri.enaioci.net/enaio/client/object/${o.properties['enaio:objectId'].value}`
+            },
+            {
+              "text": "Delete",
+              "postback": `delete ${o.properties['enaio:objectId'].value}`
             }
           ]
         }
