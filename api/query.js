@@ -11,8 +11,8 @@ app.use(bodyParser.json());
 
 const deleteObject = async (req, res) => {
   let id = req.body.queryResult.parameters.id;
-  console.log("Deleting "+id);
-  if( !id ) {
+  console.log("Deleting " + id);
+  if (!id) {
     throw new Error("id not set for delete");
   }
   await yuuvis.deleteObject(id);
@@ -121,7 +121,7 @@ const getObject = async (req, res) => {
       }
       */
     }) // forEach
-    messages.push({"carouselSelect": carousel});
+    messages.push({ "carouselSelect": carousel });
 
     res.end(JSON.stringify({
       fulfillmentText: 'Alright, Buddy',
@@ -131,6 +131,22 @@ const getObject = async (req, res) => {
 }
 
 
+const createObject = async (req, res) => {
+  let objectType = req.body.queryResult.parameters.ObjectType;
+  let date = req.body.queryResult.parameters.date;
+  let documentFields = req.body.queryResult.parameters.documentFields;
+  let text = req.body.queryResult.parameters.any;
+
+
+  let data = {};
+  data[documentFields] = text;
+  data['tenKolibri:erstelldatum'] = date;
+
+  await yuuvis.createObject(objectType, data);
+  res.status(200).end(JSON.stringify({
+    fulfillmentText: `Your document was created, Buddy!`
+  }));
+}
 
 
 app.post('*', async (req, res, next) => {
@@ -149,11 +165,15 @@ app.post('*', async (req, res, next) => {
         count(req, res);
         break;
       }
-      case 'Delete': {
-        deleteObject(req,res);
+      case 'Create': {
+        createObject(req, res);
         break;
       }
-      default : {
+      case 'Delete': {
+        deleteObject(req, res);
+        break;
+      }
+      default: {
         res.status(400).end("Intent not supported.");
         break;
       }
