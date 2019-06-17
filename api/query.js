@@ -141,6 +141,7 @@ const createObject = async (req, res) => {
   let data = {};
   data[documentFields] = text;
   data['tenKolibri:erstelldatum'] = date;
+  data['tenKolibri:clientdescription'] = 'DialogFlow Note';
 
   await yuuvis.createObject(objectType, data);
   res.status(200).end(JSON.stringify({
