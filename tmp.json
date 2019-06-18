@@ -1,3 +1,20 @@
-{ "data":
-    { "value": '{"objects":[{"properties":{"enaio:objectTypeId":{"value":"tenKolibri:aktennotiz"},"tenKolibri:betreff":{"value":"Hurz"},"tenKolibri:erstelldatum":{"value":"2019-06-17T12:00:00+02:00"}}}]}',
-      "options": { "contentType": "application/json" } } }
+{
+  "objects": [
+    {
+      "properties": {
+        "enaio:objectTypeId": {
+          "value": "tenKolibri:aktennotiz"
+        },
+        "tenKolibri:clienttitle": {
+          "value": "Hurz"
+        },
+        "tenKolibri:erstelldatum": {
+          "value": "1560851926000"
+        },
+        "tenKolibri:clientdescription": {
+          "value": "DialogFlow Note"
+        }
+      }
+    }
+  ]
+}
